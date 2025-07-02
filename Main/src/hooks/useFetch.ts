@@ -1,5 +1,5 @@
-// import axios from "axios";
-// import { useEffect, useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 // let AVAILABLE_KEYS = [
 //   "b0ae4133be2442148d2581435c590d6e",
@@ -8,7 +8,7 @@
 //   "38449b0c18054f7ba0c8f9ad926321a8",
 //   ""
 // ];
-// const API = "https://newsapi.org/v2";
+// const API = "http://localhost:3001";
 
 // export function useFetch(params: string, second?: string, search?: string) {
 //   const [loading, setLoading] = useState(false);
@@ -55,10 +55,8 @@
 //   return { data, loading };
 // }
 
-import axios from "axios";
-import { useEffect, useState } from "react";
 
-const BASE_URL = ".netlify/functions/fetchNews";
+const BASE_URL = "https://news-app-s8op.onrender.com/news";
 
 export function useFetch(params: string, second?: string, search?: string) {
   const [loading, setLoading] = useState(false);
@@ -68,22 +66,18 @@ export function useFetch(params: string, second?: string, search?: string) {
     setLoading(true);
     try {
       const res = await axios.get(BASE_URL, {
-        params: {
-          params,
-          second,
-          search,
-        },
+        params: { params, second, search },
       });
       setData(res.data);
     } catch (error) {
-      console.error("Serverless fetch failed:", error);
+      console.error("Proxy fetch failed:", error);
     }
     setLoading(false);
   };
 
   useEffect(() => {
     getData();
-  }, [params, search, second]);
+  }, [params, second, search]);
 
   return { data, loading };
 }
