@@ -122,7 +122,7 @@ export default function Index() {
     }, 2000);
   }, []);
 
-  const baseDomain = "rtpldigital.com";
+  const baseDomain = "rd-infosphere.netlify.app";
 
   return (
     <View style={{ flex: 2, paddingTop: "10%", backgroundColor: "white" }}>
@@ -133,7 +133,7 @@ export default function Index() {
       ) : isConnected ? (
         <WebView
           ref={webViewRef}
-          source={{ uri: "https://rtpldigital.com/products" }}
+          source={{ uri: "https://rd-infosphere.netlify.app/" }}
           onNavigationStateChange={(navState) => setCanGoBack(navState.canGoBack)}
           onShouldStartLoadWithRequest={(request) => {
             const url = request.url;
