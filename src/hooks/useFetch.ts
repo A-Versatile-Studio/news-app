@@ -1,37 +1,56 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-const API = "https://newsapi.org/v2"
-const KEY = "b0ae4133be2442148d2581435c590d6e"
+let AVAILABLE_KEYS = [
+  "b0ae4133be2442148d2581435c590d6e",
+  "ea1f7422a5004b92a533c1c9b3658040",
+  "5c511be76bb840758599f398617b8e32",
+  "38449b0c18054f7ba0c8f9ad926321a8",
+  ""
+];
+const API = "https://newsapi.org/v2";
+
 export function useFetch(params: string, second?: string, search?: string) {
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<any>();
 
-    const getData = async () => {
-        try {
+  const getData = async () => {
+    setLoading(true);
+    let keyIndex = 0;
+    let success = false;
 
-            setLoading(true);
-            let reqURL = search ? `${API}/${params}?${second}=${search}` :  `${API}/${params}`
-            const req = await axios.get(reqURL, {
-                headers: {
-                    "X-Api-Key": KEY
-                }
-            })
-            if (req.status === 200) {
-                setData(req.data)
-            }
+    while (keyIndex < AVAILABLE_KEYS.length && !success) {
+      const KEY = AVAILABLE_KEYS[keyIndex];
+      try {
+        let reqURL = search
+          ? `${API}/${params}?${second}=${search}`
+          : `${API}/${params}`;
+
+        const req = await axios.get(reqURL, {
+          headers: {
+            "X-Api-Key": KEY,
+          },
+        });
+
+        setData(req.data);
+        success = true; // ✅ success, stop loop
+      } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response?.status === 429) {
+          console.warn(`Key ${keyIndex + 1} hit rate limit. Switching key...`);
+          keyIndex++;
+        } else {
+          console.error("Request failed:", error);
+          break; // Other errors, don't retry
         }
-        catch (error) {
-            return 404
-        }
-        finally {
-            setLoading(false)
-        }
+      }
     }
 
-    useEffect(() => {
-        getData()
-    }, [params])
+    setLoading(false);
+  };
 
-    return {data, loading}
+  useEffect(() => {
+    getData();
+  }, [params, search, second]);
+
+  return { data, loading };
 }
